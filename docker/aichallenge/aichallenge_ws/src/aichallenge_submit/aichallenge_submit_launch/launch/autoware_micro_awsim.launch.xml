@@ -229,7 +229,7 @@
     </group>
   </group>
 
-  <node pkg="simple_pure_pursuit" exec="simple_pure_pursuit" name="simple_pure_pursuit_node" output="screen">
+  <!-- <node pkg="simple_pure_pursuit" exec="simple_pure_pursuit" name="simple_pure_pursuit_node" output="screen">
     <param name="use_external_target_vel" value="false"/>
     <param name="external_target_vel" value="100.0"/>
     <param name="lookahead_gain" value="0.4"/>
@@ -239,7 +239,15 @@
     <remap from="input/kinematics" to="/localization/kinematic_state"/>
     <remap from="input/trajectory" to="/planning/scenario_planning/trajectory"/>
     <remap from="output/control_cmd" to="/control/command/control_cmd"/>
-  </node>
+  </node> -->
+
+  <!-- Control -->
+  <group>
+    <include file="$(find-pkg-share autoware_launch)/launch/components/tier4_control_component.launch.xml"/>
+  </group>
+
+
+
 
   <!-- vehicle -->
   <include file="$(find-pkg-share raw_vehicle_cmd_converter)/launch/raw_vehicle_converter.launch.xml">
