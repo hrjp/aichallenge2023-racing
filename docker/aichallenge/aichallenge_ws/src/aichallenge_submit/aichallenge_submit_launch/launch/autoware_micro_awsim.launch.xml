@@ -228,7 +228,11 @@
       <node pkg="path_to_trajectory" exec="csv_to_trajectory_node" name="csv_to_trajectory" output="screen">
         <param name="csv_file_path" value="$(find-pkg-share aichallenge_submit_launch)/map/traj_race_cl.csv"/>
         <param name="velocity_rate" value="0.6"/>
+        <param name="trajectory_length" value="200.0"/>
+        <param name="trajectory_margin" value="2.0"/>
+        <param name="next_point_threshold" value="30.0"/>
         <remap from="output" to="/planning/scenario_planning/trajectory"/>
+        <remap from="in_odom" to="/awsim/ground_truth/localization/kinematic_state"/>
       </node>
 
     </group>

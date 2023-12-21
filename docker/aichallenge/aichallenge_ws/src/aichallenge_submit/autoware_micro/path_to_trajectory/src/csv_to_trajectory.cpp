@@ -21,21 +21,26 @@ CsvToTrajectory::CsvToTrajectory() : Node("csv_to_trajectory_node") {
   using std::placeholders::_1;
   this->declare_parameter<std::string>("csv_file_path", "");
   this->declare_parameter<float>("velocity_rate", 1.0f);
+  this->declare_parameter<float>("trajectory_length", 100.0f);
+  this->declare_parameter<float>("trajectory_margin", 2.0f);
+  this->declare_parameter<float>("next_point_threshold", 30.0f);
 
   std::string csv_file_path;
   this->get_parameter("csv_file_path", csv_file_path);
-  this->get_parameter("velocity_rate", this->velocity_rate);
+  this->get_parameter("velocity_rate", this->velocity_rate_);
+  this->get_parameter("trajectory_length", this->trajectory_length_);
+  this->get_parameter("trajectory_margin", this->trajectory_margin_);
+  this->get_parameter("next_point_threshold", this->next_point_threshold_);
 
   if (csv_file_path.empty()) {
       RCLCPP_ERROR(this->get_logger(), "No CSV file path provided");
       rclcpp::shutdown();
       return;
   }
-
+  rclcpp::QoS qos(rclcpp::KeepLast(1));
+  this->sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(
+      "in_odom", qos, std::bind(&CsvToTrajectory::odomCallback, this, _1));
   this->pub_ = this->create_publisher<Trajectory>("output", 1);
-  this->timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(10),
-            std::bind(&CsvToTrajectory::timerCallback, this));
   this->readCsv(csv_file_path);
 
 }
@@ -62,7 +67,7 @@ void CsvToTrajectory::readCsv(const std::string& file_path) {
       point.pose.orientation.y = 0.0;
       point.pose.orientation.z = sin(yaw / 2);
       point.pose.orientation.w = cos(yaw / 2);
-      point.longitudinal_velocity_mps = values[5] * this->velocity_rate;
+      point.longitudinal_velocity_mps = values[5] * this->velocity_rate_;
       point.acceleration_mps2 = values[6];
 
       trajectory_points_.push_back(point);
@@ -70,19 +75,30 @@ void CsvToTrajectory::readCsv(const std::string& file_path) {
   RCLCPP_INFO(this->get_logger(), "Loaded %zu trajectory points", trajectory_points_.size());
 }
 
-void CsvToTrajectory::timerCallback() {
-    if (current_point_index_ >= trajectory_points_.size()) return;
+void CsvToTrajectory::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odometry)
+{
+  if (current_point_index_ >= trajectory_points_.size()) return;
 
-    Trajectory trajectory;
-    // Set trajectory header
-    trajectory.header.frame_id = "map";
-    trajectory.header.stamp = this->now();
-
-    for (const auto& point : trajectory_points_) {
-        trajectory.points.push_back(point);
+  Trajectory trajectory;
+  // Set trajectory header
+  trajectory.header.frame_id = "map";
+  trajectory.header.stamp = this->now();
+  while(true){
+    const float dis = std::hypot(
+        trajectory_points_[current_point_index_].pose.position.x - odometry->pose.pose.position.x,
+        trajectory_points_[current_point_index_].pose.position.y - odometry->pose.pose.position.y);
+    if(dis > next_point_threshold_){
+      break;
     }
+    current_point_index_++;
+  }
+  const int start_index = std::max(0, int(current_point_index_ - next_point_threshold_/trajectory_margin_));
+  const int end_index = std::min(int(trajectory_points_.size()), int(current_point_index_ + trajectory_length_/trajectory_margin_));
+  for(int i = start_index; i < end_index; i++){
+    trajectory.points.push_back(trajectory_points_[i]);
+  }
 
-    pub_->publish(trajectory);
+  pub_->publish(trajectory);
 }
 
 int main(int argc, char const* argv[]) {
