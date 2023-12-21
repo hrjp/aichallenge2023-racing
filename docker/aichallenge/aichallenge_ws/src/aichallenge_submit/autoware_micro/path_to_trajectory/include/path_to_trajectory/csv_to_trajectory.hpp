@@ -15,6 +15,7 @@
 #ifndef PATH_TO_TRAJECTORY__CSV_TO_TRAJECTORY_HPP_
 #define PATH_TO_TRAJECTORY__CSV_TO_TRAJECTORY_HPP_
 
+#include "nav_msgs/msg/odometry.hpp"
 #include "autoware_auto_planning_msgs/msg/trajectory.hpp"
 #include "autoware_auto_planning_msgs/msg/trajectory_point.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -24,23 +25,24 @@
 #include <vector>
 
 class CsvToTrajectory : public rclcpp::Node {
- public:
+public:
   using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   using TrajectoryPoint = autoware_auto_planning_msgs::msg::TrajectoryPoint;
 
- public:
   CsvToTrajectory();
 
- private:
-  rclcpp::Publisher<Trajectory>::SharedPtr pub_;
-  rclcpp::TimerBase::SharedPtr timer_;
-  std::vector<TrajectoryPoint> trajectory_points_;
-
-  size_t current_point_index_ = 0;
-  float velocity_rate = 1.0f;
-
 private:
-  void timerCallback();
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_odom_;
+  rclcpp::Publisher<Trajectory>::SharedPtr pub_;
+  std::vector<TrajectoryPoint> trajectory_points_;
+  size_t current_point_index_ = 0;
+  float velocity_rate_ = 1.0f;
+  float trajectory_length_ = 200.0f;
+  float trajectory_margin_ = 2.0f;
+  float next_point_threshold_ = 30.0f;
+  int now_index_ = 0;
+
+  void odomCallback(const nav_msgs::msg::Odometry::SharedPtr odometry);
   void readCsv(const std::string& csv_file_path);
 };
 
