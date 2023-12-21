@@ -22,7 +22,7 @@
     mpc_weight_lat_error: 0.3                    # lateral error weight in matrix Q
     mpc_weight_heading_error: 0.0                # heading error weight in matrix Q
     mpc_weight_heading_error_squared_vel: 0.3    # heading error * velocity weight in matrix Q
-    mpc_weight_steering_input: 3.0               # steering error weight in matrix R
+    mpc_weight_steering_input: 1.0               # steering error weight in matrix R
     mpc_weight_steering_input_squared_vel: 3.0  # steering error * velocity weight in matrix R
     mpc_weight_lat_jerk: 0.0                     # lateral jerk weight in matrix R
     mpc_weight_steer_rate: 0.0                   # steering rate weight in matrix R
@@ -47,9 +47,9 @@
     vehicle_model_type: "kinematics" # vehicle model type for mpc prediction. option is kinematics, kinematics_no_delay, and dynamics
     input_delay: 0.14                # steering input delay time for delay compensation
     vehicle_model_steer_tau: 0.01     # steering dynamics time constant (1d approximation) [s]
-    steer_rate_lim_dps: 40.0         # steering angle rate limit [deg/s]
-    acceleration_limit: 2.0          # acceleration limit for trajectory velocity modification [m/ss]
-    velocity_time_constant: 0.3      # velocity dynamics time constant  for trajectory velocity modification [s]
+    steer_rate_lim_dps: 286.0         # steering angle rate limit [deg/s]
+    acceleration_limit: 100.0          # acceleration limit for trajectory velocity modification [m/ss]
+    velocity_time_constant: 0.61      # velocity dynamics time constant  for trajectory velocity modification [s]
 
     # -- lowpass filter for noise reduction --
     steering_lpf_cutoff_hz: 3.0 # cutoff frequency of lowpass filter for steering command [Hz]
@@ -65,7 +65,7 @@
 
     # steer offset
     steering_offset:
-      enable_auto_steering_offset_removal: true
+      enable_auto_steering_offset_removal: false
       update_vel_threshold: 5.56
       update_steer_threshold: 0.035
       average_num: 1000
