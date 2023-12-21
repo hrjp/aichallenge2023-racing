@@ -2,10 +2,10 @@
   ros__parameters:
     delay_compensation_time: 0.17
 
-    enable_smooth_stop: true
-    enable_overshoot_emergency: true
-    enable_large_tracking_error_emergency: true
-    enable_slope_compensation: true
+    enable_smooth_stop: false
+    enable_overshoot_emergency: false
+    enable_large_tracking_error_emergency: false
+    enable_slope_compensation: false
     enable_keep_stopped_until_steer_convergence: true
 
     # state transition
@@ -23,10 +23,10 @@
     kp: 3.0
     ki: 0.1
     kd: 0.0
-    max_out: 1.0
-    min_out: -1.0
-    max_p_effort: 6.0
-    min_p_effort: -8.0
+    max_out: 100.0
+    min_out: -100.0
+    max_p_effort: 600.0
+    min_p_effort: -600.0
     max_i_effort: 0.3
     min_i_effort: -0.3
     max_d_effort: 0.0
@@ -56,16 +56,16 @@
 
     # emergency state
     emergency_vel: 0.0
-    emergency_acc: -5.0
-    emergency_jerk: -3.0
+    emergency_acc: -500.0
+    emergency_jerk: -300.0
 
     # acceleration limit
-    max_acc: 5.0
-    min_acc: -8.0
+    max_acc: 30.0
+    min_acc: -30.0
 
     # jerk limit
-    max_jerk: 4.0
-    min_jerk: -8.0
+    max_jerk: 50.0
+    min_jerk: -50.0
 
     # pitch
     use_trajectory_for_pitch_calculation: false

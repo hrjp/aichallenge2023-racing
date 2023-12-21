@@ -41,6 +41,7 @@ private:
   float trajectory_margin_ = 2.0f;
   float next_point_threshold_ = 30.0f;
   int now_index_ = 0;
+  float z_position_ = 0.0f;
 
   void odomCallback(const nav_msgs::msg::Odometry::SharedPtr odometry);
   void readCsv(const std::string& csv_file_path);

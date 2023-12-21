@@ -24,6 +24,7 @@ CsvToTrajectory::CsvToTrajectory() : Node("csv_to_trajectory_node") {
   this->declare_parameter<float>("trajectory_length", 100.0f);
   this->declare_parameter<float>("trajectory_margin", 2.0f);
   this->declare_parameter<float>("next_point_threshold", 30.0f);
+  this->declare_parameter<float>("z_position", 0.0f);
 
   std::string csv_file_path;
   this->get_parameter("csv_file_path", csv_file_path);
@@ -31,6 +32,7 @@ CsvToTrajectory::CsvToTrajectory() : Node("csv_to_trajectory_node") {
   this->get_parameter("trajectory_length", this->trajectory_length_);
   this->get_parameter("trajectory_margin", this->trajectory_margin_);
   this->get_parameter("next_point_threshold", this->next_point_threshold_);
+  this->get_parameter("z_position", this->z_position_);
 
   if (csv_file_path.empty()) {
       RCLCPP_ERROR(this->get_logger(), "No CSV file path provided");
@@ -61,8 +63,8 @@ void CsvToTrajectory::readCsv(const std::string& file_path) {
       TrajectoryPoint point;
       point.pose.position.x = values[1];
       point.pose.position.y = values[2];
-      point.pose.position.z = 0.0;
-      double yaw = values[3]; // Z軸周りの回転角度（ラジアン単位）
+      point.pose.position.z = z_position_;
+      double yaw = values[3]+M_PI_2; // Z軸周りの回転角度（ラジアン単位）
       point.pose.orientation.x = 0.0;
       point.pose.orientation.y = 0.0;
       point.pose.orientation.z = sin(yaw / 2);
@@ -81,8 +83,7 @@ void CsvToTrajectory::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom
 
   Trajectory trajectory;
   // Set trajectory header
-  trajectory.header.frame_id = "map";
-  trajectory.header.stamp = this->now();
+  trajectory.header = odometry->header;
   while(true){
     const float dis = std::hypot(
         trajectory_points_[current_point_index_].pose.position.x - odometry->pose.pose.position.x,
@@ -92,7 +93,7 @@ void CsvToTrajectory::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom
     }
     current_point_index_++;
   }
-  const int start_index = std::max(0, int(current_point_index_ - next_point_threshold_/trajectory_margin_));
+  const int start_index = std::max(0, int(current_point_index_ - (2.0*next_point_threshold_)/trajectory_margin_));
   const int end_index = std::min(int(trajectory_points_.size()), int(current_point_index_ + trajectory_length_/trajectory_margin_));
   for(int i = start_index; i < end_index; i++){
     trajectory.points.push_back(trajectory_points_[i]);
