@@ -9,6 +9,9 @@ Panels:
         - /Planning1/ScenarioPlanning1
         - /Planning1/ScenarioPlanning1/ScenarioTrajectory1
         - /Planning1/ScenarioPlanning1/ScenarioTrajectory1/View Path1
+        - /Control1
+        - /Control1/Predicted Trajectory1
+        - /Control1/Predicted Trajectory1/View Path1
       Splitter Ratio: 0.557669460773468
     Tree Height: 150
   - Class: rviz_common/Selection
@@ -870,7 +873,7 @@ Visualization Manager:
                 Vehicle Length: 4.769999980926514
                 Vehicle Width: 1.8300000429153442
               View Path:
-                Alpha: 0.9990000128746033
+                Alpha: 0.30000001192092896
                 Color: 0; 0; 0
                 Constant Color: false
                 Value: true
@@ -1220,7 +1223,8 @@ Visualization Manager:
                       Enabled: true
                       Name: Bound
                       Namespaces:
-                        {}
+                        left_bound: true
+                        right_bound: true
                       Topic:
                         Depth: 5
                         Durability Policy: Volatile
@@ -1926,7 +1930,7 @@ Visualization Manager:
     - Class: rviz_common/Group
       Displays:
         - Class: rviz_plugins/Trajectory
-          Color Border Vel Max: 3
+          Color Border Vel Max: 60
           Enabled: true
           Name: Predicted Trajectory
           Topic:
@@ -1948,9 +1952,9 @@ Visualization Manager:
           View Path:
             Alpha: 1
             Color: 255; 255; 255
-            Constant Color: true
+            Constant Color: false
             Value: true
-            Width: 0.05000000074505806
+            Width: 1
           View Point:
             Alpha: 1
             Color: 0; 60; 255
@@ -1962,10 +1966,10 @@ Visualization Manager:
             Value: false
           View Velocity:
             Alpha: 1
-            Color: 0; 0; 0
+            Color: 0; 170; 0
             Constant Color: false
             Scale: 0.30000001192092896
-            Value: false
+            Value: true
         - Class: rviz_default_plugins/MarkerArray
           Enabled: false
           Name: Debug/MPC
@@ -2092,11 +2096,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: -5.858969211578369
+      Scale: -9.935269355773926
       Target Frame: base_link
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 9.914539337158203
-      Y: -19.328699111938477
+      X: 1.2082834243774414
+      Y: 8.773386001586914
     Saved:
       - Class: rviz_default_plugins/ThirdPersonFollower
         Distance: 18
